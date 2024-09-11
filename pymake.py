@@ -1,7 +1,14 @@
+"""
+PyMake is a simple, Python-based build system designed to simplify the process of compiling and running C++ projects. It provides an intuitive API for configuring your build process and executing compiled programs.
+"""
+
 import os
 import subprocess
 import pathlib
 from typing import List, Optional
+
+
+__version__ = "0.1.0"
 
 
 class CompilerConfig:
