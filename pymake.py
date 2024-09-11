@@ -6,7 +6,6 @@ from typing import List, Optional
 
 class CompilerConfig:
     def __init__(self):
-        self.main_file: Optional[pathlib.Path] = None
         self.source_files: List[pathlib.Path] = []
         self.include_directories: List[pathlib.Path] = []
         self.defines: List[str] = []
@@ -22,7 +21,6 @@ class CompilerConfig:
         self.compile_error: bool = False
 
     def clear(self):
-        self.main_file = None
         self.source_files.clear()
         self.include_directories.clear()
         self.defines.clear()
@@ -39,16 +37,6 @@ class CompilerConfig:
 
 
 _compiler_config = CompilerConfig()
-
-
-def set_main_file(file_name: str):
-    """
-    Sets the main file for compilation.
-
-    Args:
-        file_name (str): Name of the main file.
-    """
-    _compiler_config.main_file = pathlib.Path(file_name)
 
 
 def add_source_file(*file_names: str):
@@ -209,6 +197,9 @@ def build(
     """
     flags = flags or []
 
+    if not _compiler_config.output_directory.exists():
+        os.makedirs(_compiler_config.output_directory)
+
     output_path = _compiler_config.output_directory / output_file
     compile_command = [
         compiler,
@@ -227,9 +218,7 @@ def build(
         f"-I{directory}" for directory in _compiler_config.include_directories
     )
     compile_command.extend(f"-D{macro}" for macro in _compiler_config.defines)
-    compile_command.extend(
-        f"-L{path}" for path in _compiler_config.library_paths
-    )
+    compile_command.extend(f"-L{path}" for path in _compiler_config.library_paths)
     compile_command.extend(f"-l{lib}" for lib in _compiler_config.libraries)
     compile_command.extend(_compiler_config.compiler_flags)
     compile_command.extend(flags)
